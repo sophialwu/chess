@@ -1,8 +1,10 @@
 # Chess
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/chess`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is a game of chess that is playable on the command line interface for two players.
 
-TODO: Delete this and the text above, and describe your gem
+Chess is a two-player strategy board game played on an 8x8 grid. Each player has 16 pieces: one king, one queen, two rooks, two knights, two bishops, and eight pawns. Each piece can move in different ways. The objective of the game is to essentially ‘checkmate’ the opponent’s king by placing it under threat of capture that is inescapable.
+
+If you would like more detail on the rules of chess, click [here](http://www.chessvariants.com/d.chess/chess.html).
 
 ## Installation
 
@@ -22,7 +24,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To start the game, execute:
+
+    $ ruby play_game.rb
 
 ## Development
 
