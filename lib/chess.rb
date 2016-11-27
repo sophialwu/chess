@@ -8,6 +8,7 @@ require_relative "chess/bishop"
 require_relative "chess/queen"
 require_relative "chess/king"
 require_relative "chess/board"
+require "paint"
 
 module Chess
   # Your code goes here...
