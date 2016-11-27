@@ -6,6 +6,7 @@ module Chess
 
     def initialize(color, location)
       super
+      @symbol = @color == "white" ? "\u{2658}" : "\u{265E}"
       @moves = possible_moves
     end
 

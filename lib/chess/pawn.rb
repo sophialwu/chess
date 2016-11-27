@@ -3,9 +3,11 @@ module Chess
   # Represents the pawn piece
   class Pawn < Piece
     attr_accessor :moves, :moved
+    attr_reader :symbol
 
     def initialize(color, location)
       super
+      @symbol = @color == "white" ? "\u{2659}" : "\u{265F}"
       @moves = possible_moves
       @moved = false
     end
