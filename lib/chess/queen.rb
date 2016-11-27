@@ -3,6 +3,7 @@ module Chess
   # Represents the queen piece
   class Queen < Piece
     attr_accessor :moves
+    attr_reader :symbol
 
     def initialize(color, location)
       super

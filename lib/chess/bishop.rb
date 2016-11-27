@@ -3,6 +3,7 @@ module Chess
   # Represents the bishop piece
   class Bishop < Piece
     attr_accessor :moves
+    attr_reader :symbol
 
     def initialize(color, location)
       super

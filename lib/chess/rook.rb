@@ -3,6 +3,7 @@ module Chess
   # Represents the rook piece
   class Rook < Piece
     attr_accessor :moves
+    attr_reader :symbol
 
     def initialize(color, location)
       super
