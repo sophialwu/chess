@@ -29,6 +29,35 @@ module Chess
       board
     end
 
+    # Returns a stringifed version of the board
+    def to_s
+      board = "\n"
+      background = [248,250,210]
+      @state.reverse.each_with_index do |row, i|
+        board += "#{(8 - i)} "
+        row.each do |square|
+          if square == nil
+            board += Paint["   ", nil, background]
+          else
+            board += Paint[" #{square.symbol} ", nil, background]
+          end
+          background = switch_background(background)
+        end
+        board += "\n"
+        background = switch_background(background)
+      end
+      board += "   a  b  c  d  e  f  g  h "
+    end
+
+    # Returns white when argument given is gray and 
+    # returns gray when argument given is white
+    def switch_background(color)
+      color == [248,250,210] ? [215,188,149] : [248,250,210]
+    end
+    
+
+    private
+
     # Returns a row of pawns as an array
     def add_pawn_row(color, row)
       pawn_row = []
