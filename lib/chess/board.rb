@@ -29,6 +29,16 @@ module Chess
       board
     end
 
+    # Moves the piece located at [from_row, from_column]
+    # to the new location at [to_row, to_column]
+    def move_piece(from_row, from_column, to_row, to_column)
+      piece = @state[from_row][from_column]
+      type = piece.class
+      color = piece.color
+      @state[to_row][to_column] = type.new(color, piece.location)
+      @state[from_row][from_column] = nil
+    end
+
     # Returns a stringifed version of the board
     def to_s
       board = "\n"
@@ -54,7 +64,7 @@ module Chess
     def switch_background(color)
       color == [248,250,210] ? [215,188,149] : [248,250,210]
     end
-    
+
 
     private
 

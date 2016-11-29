@@ -41,5 +41,51 @@ module Chess
       end
     end
 
+    describe "#move" do
+      let(:board) { Board.new }
+
+      context "given a white rook moving from location [0,0] to [4,0] on a "\
+              "starting board" do
+        it "moves the white rook to location [4,0]" do
+          board.move_piece(0,0,4,0)
+          expect(board.state[0][0]).to eql(nil)
+          expect(board.state[4][0].class).to eql(Rook)
+          expect(board.state[4][0].color).to eql("white")
+        end
+      end
+
+      context "given a black knight moving from location [7,6] to [5,7] on a "\
+              "starting board" do
+        it "moves the black knight to location [5,7]" do
+          board.move_piece(7,6,5,7)
+          expect(board.state[7][6]).to eql(nil)
+          expect(board.state[5][7].class).to eql(Knight)
+          expect(board.state[5][7].color).to eql("black")
+        end
+      end
+
+      context "given a black queen moving from location [7,3] to [1,3], where "\
+              "a white pawn is located" do
+        it "moves the black queen to location [1,3] and captures the "\
+           "white pawn" do
+          board.move_piece(7,6,5,7)
+          expect(board.state[7][6]).to eql(nil)
+          expect(board.state[5][7].class).to eql(Knight)
+          expect(board.state[5][7].color).to eql("black")
+        end
+      end
+
+      context "given a white pawn moving from location [1,7] to [3,7], on a "\
+              "starting board" do
+        it "moves the white pawn to location [3,7]" do
+          board.move_piece(1,7,3,7)
+          expect(board.state[1][7]).to eql(nil)
+          expect(board.state[3][7].class).to eql(Pawn)
+          expect(board.state[3][7].color).to eql("white")
+        end
+      end
+
+    end
+
   end
 end
