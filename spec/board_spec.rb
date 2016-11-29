@@ -41,7 +41,7 @@ module Chess
       end
     end
 
-    describe "#move" do
+    describe "#move_piece" do
       let(:board) { Board.new }
 
       context "given a white rook moving from location [0,0] to [4,0] on a "\
@@ -82,6 +82,146 @@ module Chess
           expect(board.state[1][7]).to eql(nil)
           expect(board.state[3][7].class).to eql(Pawn)
           expect(board.state[3][7].color).to eql("white")
+        end
+      end
+
+    end
+
+    describe "#valid_move?" do
+      let(:board) { Board.new }
+
+      context "given a white pawn moving from location [1,0] to [2,0] on a "\
+              "starting board" do
+        it "returns true" do
+          expect(board.valid_move?(1,0,2,0)).to eql(true)
+        end
+      end
+
+      context "given a white pawn moving from location [1,0] to [3,0] on a "\
+              "starting board" do
+        it "returns true" do
+          expect(board.valid_move?(1,0,3,0)).to eql(true)
+        end
+      end
+
+      context "given a black pawn moving from location [6,5] to [5,5] on a "\
+              "starting board" do
+        it "returns true" do
+          expect(board.valid_move?(6,5,5,5)).to eql(true)
+        end
+      end
+
+      context "given a black pawn moving from location [6,5] to [5,4] on a "\
+              "starting board" do
+        it "returns false" do
+          expect(board.valid_move?(6,5,5,4)).to eql(false)
+        end
+      end
+
+      context "given a black pawn moving from location [6,5] to [5,4] to "\
+              "capture a white pawn" do
+        it "returns true" do
+          board.state[5][4] = Pawn.new("white", [5,4])
+          expect(board.valid_move?(6,5,5,4)).to eql(true)
+        end
+      end
+
+      context "given a white pawn moving from location [2,3] to [4,3] after "\
+              "it has already moved already" do
+        it "returns false" do
+          board.move_piece(1,3,2,3)
+          expect(board.valid_move?(2,3,4,3)).to eql(false)
+        end
+      end
+
+      context "given a white rook moving from location [0,0] to [1,0], where "\
+              "there is a white pawn" do
+        it "returns false" do
+          expect(board.valid_move?(0,0,1,0)).to eql(false)
+        end
+      end
+
+      context "given a white rook moving from location [0,0] to [4,0], where "\
+              "there is a white pawn in between" do
+        it "returns false" do
+          expect(board.valid_move?(0,0,4,0)).to eql(false)
+        end
+      end
+
+      context "given a white rook moving from location [0,0] to [1,0], where "\
+              "the new location is empty" do
+        it "returns true" do
+          board.state[1][0] = nil
+          expect(board.valid_move?(0,0,1,0)).to eql(true)
+        end
+      end
+
+      context "given a white rook moving from location [0,0] to [4,0], where "\
+              "there are no pieces in between" do
+        it "returns true" do
+          board.state[1][0] = nil
+          expect(board.valid_move?(0,0,4,0)).to eql(true)
+        end
+      end
+
+      context "given a black knight moving from location [7,1] to [5,2] "\
+              "on a starting board" do
+        it "returns true" do
+          expect(board.valid_move?(7,1,5,2)).to eql(true)
+        end
+      end
+
+      context "given a black knight moving from location [7,1] to [6,3] "\
+              "on a starting board" do
+        it "returns false" do
+          expect(board.valid_move?(7,1,6,3)).to eql(false)
+        end
+      end
+
+      context "given a white bishop moving from location [0,5] to [2,7], "\
+              "where this is a with pawn in between" do
+        it "returns false" do
+          expect(board.valid_move?(0,5,2,7)).to eql(false)
+        end
+      end
+
+      context "given a white bishop moving from location [0,5] to [2,7] "\
+              "with no pieces in between" do
+        it "returns true" do
+          board.state[1][6] = nil
+          expect(board.valid_move?(0,5,2,7)).to eql(true)
+        end
+      end
+
+      context "given a white queen moving from location [3,3] to [6,3] "\
+              "to capture a black pawn" do
+        it "returns true" do
+          board.state[3][3] = Queen.new("white", [3,3])
+          expect(board.valid_move?(3,3,6,3)).to eql(true)
+        end
+      end
+
+      context "given a black queen moving from location [3,3] to [6,3], "\
+              "where tbhere is a black pawn" do
+        it "returns false" do
+          board.state[3][3] = Queen.new("black", [3,3])
+          expect(board.valid_move?(3,3,6,3)).to eql(false)
+        end
+      end
+
+      context "given a white king moving from location [3,3] to [5,3], "\
+              "with no pieces in between" do
+        it "returns false" do
+          board.state[3][3] = King.new("white", [3,3])
+          expect(board.valid_move?(3,3,5,3)).to eql(false)
+        end
+      end
+
+      context "given a white king moving from location [3,3] to [4,3], "\
+              "with no pieces in between" do
+        it "returns true" do
+          board.state[3][3] = King.new("white", [3,3])
+          expect(board.valid_move?(3,3,4,3)).to eql(true)
         end
       end
 
