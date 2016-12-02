@@ -17,12 +17,16 @@ module Chess
     def possible_moves
       row = @location[0]
       column = @location[1]
+      moves = []
       unless row == 7
         if @color == "white"
-          return white_pawn_moves(row, column)
+          moves = white_pawn_moves(row, column)
         else
-          return black_pawn_moves(row, column)
+          moves = black_pawn_moves(row, column)
         end
+      end
+      moves.select do |position|
+        position.all? { |value| value.between?(0,7) }
       end
     end
 
@@ -33,8 +37,8 @@ module Chess
       moves = []
       moves << [row + 1, column]
       moves << [row + 2, column] unless @moved
-      moves << [row + 1, column - 1] unless column == 0
-      moves << [row + 1, column + 1] unless column == 7
+      moves << [row + 1, column - 1]
+      moves << [row + 1, column + 1]
       moves
     end
 
@@ -43,8 +47,8 @@ module Chess
       moves = []
       moves << [row - 1, column]
       moves << [row - 2, column] unless @moved
-      moves << [row - 1, column + 1] unless column == 7
-      moves << [row - 1, column - 1] unless column == 0
+      moves << [row - 1, column + 1]
+      moves << [row - 1, column - 1]
       moves
     end
 
