@@ -50,7 +50,7 @@ module Chess
       return false if piece == nil
 
       new_location = [to_row, to_column]
-      return false unless piece.possible_moves.include? new_location
+      return false unless piece.moves.include? new_location
 
       if piece.class == Pawn && to_column != from_column
         return enemy_piece_at_location?(piece.color, new_location)
@@ -64,6 +64,24 @@ module Chess
       end
 
       true
+    end
+
+    # Returns true if the given color's king is checkmated 
+    def check?(color)
+      pieces = @state.map do |row|
+        row.select { |piece| piece != nil }
+      end.flatten
+
+      king = pieces.select do |piece| 
+        piece.class == King && piece.color == color
+      end[0]
+
+      opposing_pieces = pieces.select { |piece| piece.color != color }
+
+      opposing_pieces.any? do |piece|
+        valid_move?(piece.location[0], piece.location[1], 
+                    king.location[0], king.location[1])
+      end
     end
 
     # Returns a stringifed version of the board
@@ -143,7 +161,7 @@ module Chess
         end
       elsif to_row > from_row && to_column <= from_column
         row += 1
-        column += 1
+        column -= 1
         until row == to_row
           return false unless @state[row][column] == nil
           row += 1

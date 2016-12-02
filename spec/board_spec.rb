@@ -202,7 +202,7 @@ module Chess
       end
 
       context "given a black queen moving from location [3,3] to [6,3], "\
-              "where tbhere is a black pawn" do
+              "where there is a black pawn" do
         it "returns false" do
           board.state[3][3] = Queen.new("black", [3,3])
           expect(board.valid_move?(3,3,6,3)).to eql(false)
@@ -222,6 +222,74 @@ module Chess
         it "returns true" do
           board.state[3][3] = King.new("white", [3,3])
           expect(board.valid_move?(3,3,4,3)).to eql(true)
+        end
+      end
+
+    end
+
+    describe "#check?" do
+      let(:board) { Board.new }
+
+      context "given a black king on a starting board" do
+        it "returns false" do
+          expect(board.check?("black")).to eql(false)
+        end
+      end
+
+      context "given a white king at [0,4] with an unobstructed path to "\
+              "black queen at [4,4]" do
+        it "returns true" do
+          board.state[1][4] = nil
+          board.state[4][4] = Queen.new("black", [4,4])
+          expect(board.check?("white")).to eql(true)
+        end
+      end
+
+      context "given a white king at [0,4] with an obstructed path to "\
+              "black queen at [4,4]" do
+        it "returns false" do
+          board.state[4][4] = Queen.new("black", [4,4])
+          expect(board.check?("white")).to eql(false)
+        end
+      end
+
+      context "given a black king at [3,7] with an unobstructed path to "\
+              "white rook at [3,2]" do
+        it "returns true" do
+          board.state[7][4] = nil
+          board.state[3][7] = King.new("black", [3,7])
+          board.state[3][2] = Rook.new("white", [3,2])
+          expect(board.check?("black")).to eql(true)
+        end
+      end
+
+      context "given a white king at [5,6] with unobstructed paths to "\
+              "black pawns at [6,5] and [6,7]" do
+        it "returns true" do
+          board.state[0][4] = nil
+          board.state[5][6] = King.new("white", [5,6])
+          expect(board.check?("white")).to eql(true)
+        end
+      end
+
+      context "given a white king at [3,4] with an unobstructed path to "\
+              "black knight at [5,3]" do
+        it "returns true" do
+          board.state[0][4] = nil
+          board.state[3][4] = King.new("white", [3,4])
+          board.state[5][3] = Knight.new("black", [5,3])
+          expect(board.check?("white")).to eql(true)
+        end
+      end
+
+      context "given a black king at [4,1] with an unobstructed path to "\
+              "white king at [4,2]" do
+        it "returns true" do
+          board.state[7][4] = nil
+          board.state[0][4] = nil
+          board.state[4][1] = King.new("black", [4,1])
+          board.state[4][2] = King.new("white", [4,2])
+          expect(board.check?("black")).to eql(true)
         end
       end
 
