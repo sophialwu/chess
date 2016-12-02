@@ -52,8 +52,12 @@ module Chess
       new_location = [to_row, to_column]
       return false unless piece.moves.include? new_location
 
-      if piece.class == Pawn && to_column != from_column
-        return enemy_piece_at_location?(piece.color, new_location)
+      if piece.class == Pawn
+        if to_column == from_column
+          return empty_location?([to_row, to_column])
+        else
+          return enemy_piece_at_location?(piece.color, new_location)
+        end
       end
 
       return false unless empty_location?([to_row, to_column]) || 
@@ -66,21 +70,39 @@ module Chess
       true
     end
 
-    # Given the color, returns that color's king location on the board
-    def find_king_location(color)
+    # Given the color, returns that color's king that is on the board
+    def find_king(color)
       king = chess_pieces.select do |piece| 
         piece.class == King && piece.color == color
-      end[0].location
+      end[0]
     end
 
     # Given a color and location of the color's king,  
     # returns true if the king is checked
     def check?(color, king_location)
       opposing_pieces = chess_pieces.select { |piece| piece.color != color }
-
       opposing_pieces.any? do |piece|
         valid_move?(piece.location[0], piece.location[1], 
                     king_location[0], king_location[1])
+      end
+    end
+
+    # Given a color, returns true if the color's king is checkmated
+    def checkmate?(color)
+      king = find_king(color)
+      return false unless check?(color, king.location)
+      
+      moves = all_valid_moves(king.location, king.moves)
+
+      moves.all? do |move|
+        current_state = Marshal.load(Marshal.dump(@state))
+        @state[king.location[0]][king.location[1]] = nil # To test out the
+        @state[move[0]][move[1]] = King.new(color, move) # king's move
+
+        in_check = check?(color, move)
+        @state = current_state # Set state back to actual current state
+
+        in_check
       end
     end
 
@@ -106,6 +128,14 @@ module Chess
 
 
     private
+
+    # Given a location of a piece and it set of possible moves, returns
+    # an array of all valid moves for that piece given the board state
+    def all_valid_moves(location, moves)
+      moves.select do |move|
+        valid_move?(location[0], location[1], move[0], move[1])
+      end
+    end
 
     # Returns an array of all the chess pieces currently on the board
     def chess_pieces

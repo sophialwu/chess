@@ -232,7 +232,7 @@ module Chess
 
       context "given a black king on a starting board" do
         it "returns false" do
-          king_location = board.find_king_location("black")
+          king_location = board.find_king("black").location
           expect(board.check?("black", king_location)).to eql(false)
         end
       end
@@ -242,7 +242,7 @@ module Chess
         it "returns true" do
           board.state[1][4] = nil
           board.state[4][4] = Queen.new("black", [4,4])
-          king_location = board.find_king_location("white")
+          king_location = board.find_king("white").location
           expect(board.check?("white", king_location)).to eql(true)
         end
       end
@@ -251,7 +251,7 @@ module Chess
               "black queen at [4,4]" do
         it "returns false" do
           board.state[4][4] = Queen.new("black", [4,4])
-          king_location = board.find_king_location("white")
+          king_location = board.find_king("white").location
           expect(board.check?("white", king_location)).to eql(false)
         end
       end
@@ -262,7 +262,7 @@ module Chess
           board.state[7][4] = nil
           board.state[3][7] = King.new("black", [3,7])
           board.state[3][2] = Rook.new("white", [3,2])
-          king_location = board.find_king_location("black")
+          king_location = board.find_king("black").location
           expect(board.check?("black", king_location)).to eql(true)
         end
       end
@@ -272,7 +272,7 @@ module Chess
         it "returns true" do
           board.state[0][4] = nil
           board.state[5][6] = King.new("white", [5,6])
-          king_location = board.find_king_location("white")
+          king_location = board.find_king("white").location
           expect(board.check?("white", king_location)).to eql(true)
         end
       end
@@ -283,7 +283,7 @@ module Chess
           board.state[0][4] = nil
           board.state[3][4] = King.new("white", [3,4])
           board.state[5][3] = Knight.new("black", [5,3])
-          king_location = board.find_king_location("white")
+          king_location = board.find_king("white").location
           expect(board.check?("white", king_location)).to eql(true)
         end
       end
@@ -295,8 +295,105 @@ module Chess
           board.state[0][4] = nil
           board.state[4][1] = King.new("black", [4,1])
           board.state[4][2] = King.new("white", [4,2])
-          king_location = board.find_king_location("black")
+          king_location = board.find_king("black").location
           expect(board.check?("black", king_location)).to eql(true)
+        end
+      end
+
+    end
+
+    describe "#checkmate?" do
+      let(:board) { Board.new }
+
+      context "given a white king on a starting board" do
+        it "returns false" do
+          expect(board.checkmate?("white")).to eql(false)
+        end
+      end
+
+      context "given a white king at [0,4] in check by a "\
+              "black queen at [4,4], but not checkmate" do
+        it "returns false" do
+          board.state[1][4] = nil
+          board.state[4][4] = Queen.new("black", [4,4])
+          board.state[1][3] = nil
+          expect(board.checkmate?("white")).to eql(false)
+        end
+      end
+
+      context "given a black king at [4,1] in check by a "\
+              "white king at [4,2], but not checkmate" do
+        it "returns false" do
+          board.state[7][4] = nil
+          board.state[0][4] = nil
+          board.state[4][1] = King.new("black", [4,1])
+          board.state[4][2] = King.new("white", [4,2])
+          expect(board.checkmate?("black")).to eql(false)
+        end
+      end
+
+      context "given a black king at [3,7] in check by a "\
+              "white rook at [3,2], but not checkmate" do
+        it "returns false" do
+          board.state[7][4] = nil
+          board.state[3][7] = King.new("black", [3,7])
+          board.state[3][2] = Rook.new("white", [3,2])
+          expect(board.checkmate?("black")).to eql(false)
+        end
+      end
+
+      context "given a black king at [7,7] in check by a "\
+              "white rook at [7,1], and checkmated" do
+        it "returns true" do
+          board.instance_variable_set(:@state, board.state.map do |row|
+            row.map { |square| nil }
+          end)
+          board.state[7][7] = King.new("black", [7,7])
+          board.state[7][1] = Rook.new("white", [7,1])
+          board.state[6][0] = Rook.new("white", [6,0])
+          expect(board.checkmate?("black")).to eql(true)
+        end
+      end
+
+      context "given a black king at [7,4] in check by a "\
+              "white pawn at [6,3], and checkmated" do
+        it "returns true" do
+          board.instance_variable_set(:@state, board.state.map do |row|
+            row.map { |square| nil }
+          end)
+          board.state[7][4] = King.new("black", [7,4])
+          board.state[6][3] = Pawn.new("white", [6,3])
+          board.state[6][4] = Pawn.new("white", [6,4])
+          board.state[5][4] = King.new("white", [5,4])
+          expect(board.checkmate?("black")).to eql(true)
+        end
+      end
+
+      context "given a white king at [0,4] in check by a "\
+              "black knight at [2,5], and checkmated" do
+        it "returns true" do
+          board.state[0][6] = nil
+          board.state[1][4] = Knight.new("white", [1,4])
+          board.state[1][6] = nil
+          board.state[2][5] = Knight.new("black", [2,5])
+          expect(board.checkmate?("white")).to eql(true)
+        end
+      end
+
+      context "given a black king at [6,4] in check by a "\
+              "white bishop at [4,2], and checkmated" do
+        it "returns true" do
+          board.instance_variable_set(:@state, board.state.map do |row|
+            row.map { |square| nil }
+          end)
+          board.state[6][4] = King.new("black", [6,4])
+          board.state[6][5] = Bishop.new("white", [6,5])
+          board.state[7][5] = Bishop.new("black", [7,5])
+          board.state[4][2] = Bishop.new("white", [4,2])
+          board.state[4][4] = Knight.new("white", [4,4])
+          board.state[4][3] = Knight.new("white", [4,3])
+          board.state[7][3] = Queen.new("black", [7,3])
+          expect(board.checkmate?("black")).to eql(true)
         end
       end
 
