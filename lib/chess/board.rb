@@ -66,7 +66,7 @@ module Chess
       true
     end
 
-    # Returns true if the given color's king is checkmated 
+    # Returns true if the given color's king is checked
     def check?(color)
       pieces = @state.map do |row|
         row.select { |piece| piece != nil }
