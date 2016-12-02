@@ -232,7 +232,8 @@ module Chess
 
       context "given a black king on a starting board" do
         it "returns false" do
-          expect(board.check?("black")).to eql(false)
+          king_location = board.find_king_location("black")
+          expect(board.check?("black", king_location)).to eql(false)
         end
       end
 
@@ -241,7 +242,8 @@ module Chess
         it "returns true" do
           board.state[1][4] = nil
           board.state[4][4] = Queen.new("black", [4,4])
-          expect(board.check?("white")).to eql(true)
+          king_location = board.find_king_location("white")
+          expect(board.check?("white", king_location)).to eql(true)
         end
       end
 
@@ -249,7 +251,8 @@ module Chess
               "black queen at [4,4]" do
         it "returns false" do
           board.state[4][4] = Queen.new("black", [4,4])
-          expect(board.check?("white")).to eql(false)
+          king_location = board.find_king_location("white")
+          expect(board.check?("white", king_location)).to eql(false)
         end
       end
 
@@ -259,7 +262,8 @@ module Chess
           board.state[7][4] = nil
           board.state[3][7] = King.new("black", [3,7])
           board.state[3][2] = Rook.new("white", [3,2])
-          expect(board.check?("black")).to eql(true)
+          king_location = board.find_king_location("black")
+          expect(board.check?("black", king_location)).to eql(true)
         end
       end
 
@@ -268,7 +272,8 @@ module Chess
         it "returns true" do
           board.state[0][4] = nil
           board.state[5][6] = King.new("white", [5,6])
-          expect(board.check?("white")).to eql(true)
+          king_location = board.find_king_location("white")
+          expect(board.check?("white", king_location)).to eql(true)
         end
       end
 
@@ -278,7 +283,8 @@ module Chess
           board.state[0][4] = nil
           board.state[3][4] = King.new("white", [3,4])
           board.state[5][3] = Knight.new("black", [5,3])
-          expect(board.check?("white")).to eql(true)
+          king_location = board.find_king_location("white")
+          expect(board.check?("white", king_location)).to eql(true)
         end
       end
 
@@ -289,7 +295,8 @@ module Chess
           board.state[0][4] = nil
           board.state[4][1] = King.new("black", [4,1])
           board.state[4][2] = King.new("white", [4,2])
-          expect(board.check?("black")).to eql(true)
+          king_location = board.find_king_location("black")
+          expect(board.check?("black", king_location)).to eql(true)
         end
       end
 

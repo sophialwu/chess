@@ -66,21 +66,21 @@ module Chess
       true
     end
 
-    # Returns true if the given color's king is checked
-    def check?(color)
-      pieces = @state.map do |row|
-        row.select { |piece| piece != nil }
-      end.flatten
-
-      king = pieces.select do |piece| 
+    # Given the color, returns that color's king location on the board
+    def find_king_location(color)
+      king = chess_pieces.select do |piece| 
         piece.class == King && piece.color == color
-      end[0]
+      end[0].location
+    end
 
-      opposing_pieces = pieces.select { |piece| piece.color != color }
+    # Given a color and location of the color's king,  
+    # returns true if the king is checked
+    def check?(color, king_location)
+      opposing_pieces = chess_pieces.select { |piece| piece.color != color }
 
       opposing_pieces.any? do |piece|
         valid_move?(piece.location[0], piece.location[1], 
-                    king.location[0], king.location[1])
+                    king_location[0], king_location[1])
       end
     end
 
@@ -106,6 +106,13 @@ module Chess
 
 
     private
+
+    # Returns an array of all the chess pieces currently on the board
+    def chess_pieces
+      pieces = @state.map do |row|
+        row.select { |piece| piece != nil }
+      end.flatten
+    end
 
     # Returns a row of pawns as an array
     def add_pawn_row(color, row)
