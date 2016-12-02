@@ -10,6 +10,10 @@ module Chess
       @location = location
     end
 
+    def to_s
+      "#{self.class} #{@color} #{@location}"
+    end
+
   end
 
 end
