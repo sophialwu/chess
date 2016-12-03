@@ -2,7 +2,7 @@ module Chess
  
   # Represents the pawn piece
   class Pawn < Piece
-    attr_accessor :moves, :moved
+    attr_accessor :moves, :moved, :allow_en_passant
     attr_reader :symbol
 
     def initialize(color, location)
@@ -10,6 +10,7 @@ module Chess
       @symbol = @color == "white" ? "\u{2659}" : "\u{265F}"
       @moves = possible_moves
       @moved = false
+      @allow_en_passant = false
     end
 
     # Returns an array with all moves the pawn can make on the board,

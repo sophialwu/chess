@@ -32,12 +32,24 @@ module Chess
     # Moves the piece located at [from_row, from_column]
     # to the new location at [to_row, to_column]
     def move_piece(from_row, from_column, to_row, to_column)
-      piece = @state[from_row][from_column]
-      type = piece.class
-      color = piece.color
-      piece.moved = true if type == Pawn # No longer can move 2 spaces
-      @state[to_row][to_column] = type.new(color, piece.location)
+      piece = @state[from_row][from_column] 
+      new_location = [to_row, to_column]
+      @state[to_row][to_column] = piece.class.new(piece.color, new_location)
       @state[from_row][from_column] = nil
+      
+      moved_piece = @state[to_row][to_column]
+      if moved_piece.class == Pawn
+        if en_passant_allowed?(moved_piece, from_row)
+          moved_piece.allow_en_passant = true
+        end
+        if valid_en_passant_move?(moved_piece.color, from_row, to_column)
+          @state[from_row][to_column] = nil
+        end
+        moved_piece.moved = true
+      end
+
+      disallow_all_en_passant(piece.color) # Once a move has been made, disallow 
+                                           # taking en_passant on enemy pawns
     end
 
     # Returns true if the move is valid (given a from and to location)
@@ -125,6 +137,35 @@ module Chess
 
     private
 
+    # Returns true if the color pawn is making a valid en passant move
+    def valid_en_passant_move?(color, from_row, to_column)
+      possible_pawn = @state[from_row][to_column]
+
+      possible_pawn.class == Pawn && possible_pawn.color != color &&
+      possible_pawn.allow_en_passant == true
+    end
+
+    # Returns true if en passant is allowed on a recently moved pawn
+    def en_passant_allowed?(pawn, from_row)
+      return false if pawn.moved == true || 
+                      (pawn.location[0] - from_row).abs != 2
+      [pawn.location[1] - 1, pawn.location[1] + 1].any? do |column|
+        return false unless column.between?(0,7)
+        possible_pawn = @state[pawn.location[0]][column]
+        possible_pawn.class == Pawn && possible_pawn.color != pawn.color
+      end
+    end
+
+    # Given a color, sets @allow_en_passant to be 
+    # false for all pawns of the opposing enemy color
+    def disallow_all_en_passant(color)
+      enemy_color = color == "black" ? "white" : "black"
+      pawns_of_color = chess_pieces.select do |piece|
+        piece.class == Pawn && piece.color == enemy_color
+      end
+      pawns_of_color.each { |pawn| pawn.allow_en_passant = false }
+    end
+
     # Returns true if given a color and enemy piece that is checking the
     # king, a friendly piece can kill the enemy piece, removing the check
     def escape_checkmate_by_kill?(color, checking_piece)
@@ -149,7 +190,7 @@ module Chess
       chess_pieces.select { |piece| piece.color != color }
     end
 
-    # Given a location of a piece and it set of possible moves, returns
+    # Given a location of a piece and the set of possible moves, returns
     # an array of all valid moves for that piece given the board state
     def all_valid_moves(location, moves)
       moves.select do |move|
@@ -166,12 +207,19 @@ module Chess
 
     # Helper function for #valid_move? that returns true if the
     # move the pawn is trying to make is true or false on the board state
-    def pawn_valid_move?(piece, new_location, to_column, from_column)
+    def pawn_valid_move?(pawn, new_location, to_column, from_column)
       if to_column == from_column
-          empty_location?(new_location)
-        else
-          enemy_piece_at_location?(piece.color, new_location)
+        if (new_location[0] - pawn.location[0]).abs == 2
+          return false if pawn.moved == true
         end
+        empty_location?(new_location)
+      else
+        if enemy_piece_at_location?(pawn.color, new_location)
+          true
+        else
+          valid_en_passant_move?(pawn.color, pawn.location[0], to_column)
+        end
+      end
     end
 
     # Returns a row of pawns as an array

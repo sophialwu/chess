@@ -85,6 +85,79 @@ module Chess
         end
       end
 
+      context "given a white pawn moving from start location [1,4] to [3,4] "\
+              "with a black pawn at [3,3]" do
+        it "sets @allow_en_passant on the white pawn to true" do
+          expect(board.state[1][4].allow_en_passant).to eql(false)
+          board.move_piece(6,3,4,3)
+          board.move_piece(4,3,3,3)
+          board.move_piece(1,4,3,4)
+          expect(board.state[3][4].allow_en_passant).to eql(true)
+        end
+      end
+
+      context "given a black pawn moving from start location [6,7] to [4,7] "\
+              "with a white pawn at [4,6]" do
+        it "sets @allow_en_passant on the black pawn to true" do
+          expect(board.state[6][7].allow_en_passant).to eql(false)
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,7,4,7)
+          expect(board.state[4][7].allow_en_passant).to eql(true)
+        end
+      end
+
+      context "given a black pawn moving from start location [6,7] to [5,7], "\
+              "then [4,7] with a white pawn at [4,6]" do
+        it "does not set @allow_en_passant on the black pawn to true" do
+          expect(board.state[6][7].allow_en_passant).to eql(false)
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,7,5,7)
+          board.move_piece(5,7,4,7)
+          expect(board.state[4][7].allow_en_passant).to eql(false)
+        end
+      end
+
+      context "given a black pawn moving from start location [6,7] to [4,7] "\
+              "with a white pawn at [4,6] and white taking a turn after" do
+        it "sets @allow_en_passant on the black pawn to false" do
+          expect(board.state[6][7].allow_en_passant).to eql(false)
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,7,4,7)
+          expect(board.state[4][7].allow_en_passant).to eql(true)
+          board.move_piece(1,0,3,0)
+          expect(board.state[4][7].allow_en_passant).to eql(false)
+        end
+      end
+
+      context "given a black pawn at [3,1] taking a white pawn at [3,2] "\
+              "towards [2,2]" do
+        it "the black pawn moves to [2,2] and captures the white pawn" do
+          board.move_piece(6,1,4,1)
+          board.move_piece(4,1,3,1)
+          board.move_piece(1,2,3,2)
+          board.move_piece(3,1,2,2)
+          expect(board.state[2][2].class).to eql(Pawn)
+          expect(board.state[2][2].color).to eql("black")
+          expect(board.state[3][2]).to eql(nil)
+        end
+      end
+
+      context "given a white pawn at [4,6] taking a black pawn at [4,5] "\
+              "towards [5,5]" do
+        it "the white pawn moves to [5,5] and captures the black pawn" do
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,5,4,5)
+          board.move_piece(4,6,5,5)
+          expect(board.state[5][5].class).to eql(Pawn)
+          expect(board.state[5][5].color).to eql("white")
+          expect(board.state[4][5]).to eql(nil)
+        end
+      end
+
     end
 
     describe "#valid_move?" do
@@ -222,6 +295,41 @@ module Chess
         it "returns true" do
           board.state[3][3] = King.new("white", [3,3])
           expect(board.valid_move?(3,3,4,3)).to eql(true)
+        end
+      end
+
+      context "given a white pawn at [4,6] trying to take a black pawn at "\
+              "[4,5] en passant to [5,5]" do
+        it "returns true" do
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,5,4,5)
+          expect(board.valid_move?(4,6,5,5)).to eql(true)
+        end
+      end
+
+      context "given a white pawn at [4,6] trying to take a black pawn at "\
+              "[4,5] en passant to [5,5] (illegally, as white moved another "\
+              "piece in between" do
+        it "returns false" do
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,5,4,5)
+          board.move_piece(1,7,2,7)
+          expect(board.valid_move?(4,6,5,5)).to eql(false)
+        end
+      end
+
+      context "given a white pawn at [4,6] trying to take a black pawn at "\
+              "[4,5] en passant to [5,5] (illegally, as the black pawn took "\
+              "2 moves to get to [4,5]" do
+        it "returns false" do
+          board.move_piece(1,6,3,6)
+          board.move_piece(3,6,4,6)
+          board.move_piece(6,5,5,5)
+          board.move_piece(5,5,4,5)
+          board.move_piece(1,7,2,7)
+          expect(board.valid_move?(4,6,5,5)).to eql(false)
         end
       end
 
@@ -415,7 +523,7 @@ module Chess
 
       context "given a black king at [6,4] in check by only a white "\
               "knight at [4,3], and the ability to escape check by "\
-              "the black pawn killing the knight" do
+              "the black pawn capturing the knight" do
         it "returns true" do
           board.instance_variable_set(:@state, board.state.map do |row|
             row.map { |square| nil }
@@ -431,7 +539,7 @@ module Chess
           expect(board.checkmate?("black")).to eql(false)
         end
       end
-      
+
     end
 
   end
