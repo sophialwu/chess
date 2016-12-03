@@ -52,13 +52,8 @@ module Chess
       new_location = [to_row, to_column]
       return false unless piece.moves.include? new_location
 
-      if piece.class == Pawn
-        if to_column == from_column
-          return empty_location?([to_row, to_column])
-        else
-          return enemy_piece_at_location?(piece.color, new_location)
-        end
-      end
+      return pawn_valid_move?(piece, new_location, to_column, from_column) if
+             piece.class == Pawn
 
       return false unless empty_location?([to_row, to_column]) || 
                           enemy_piece_at_location?(piece.color, new_location)
@@ -167,6 +162,16 @@ module Chess
       pieces = @state.map do |row|
         row.select { |piece| piece != nil }
       end.flatten
+    end
+
+    # Helper function for #valid_move? that returns true if the
+    # move the pawn is trying to make is true or false on the board state
+    def pawn_valid_move?(piece, new_location, to_column, from_column)
+      if to_column == from_column
+          empty_location?(new_location)
+        else
+          enemy_piece_at_location?(piece.color, new_location)
+        end
     end
 
     # Returns a row of pawns as an array
