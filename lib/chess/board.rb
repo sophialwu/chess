@@ -80,17 +80,18 @@ module Chess
     # Given a color and location of the color's king,  
     # returns true if the king is checked
     def check?(color, king_location)
-      opposing_pieces = chess_pieces.select { |piece| piece.color != color }
-      opposing_pieces.any? do |piece|
-        valid_move?(piece.location[0], piece.location[1], 
-                    king_location[0], king_location[1])
-      end
+      !pieces_checking_king(color, king_location).empty?
     end
 
     # Given a color, returns true if the color's king is checkmated
     def checkmate?(color)
       king = find_king(color)
       return false unless check?(color, king.location)
+
+      checking_pieces = pieces_checking_king(color, king.location)
+      if checking_pieces.length == 1
+        return false if escape_checkmate_by_kill?(color, checking_pieces[0])
+      end
       
       moves = all_valid_moves(king.location, king.moves)
 
@@ -128,6 +129,30 @@ module Chess
 
 
     private
+
+    # Returns true if given a color and enemy piece that is checking the
+    # king, a friendly piece can kill the enemy piece, removing the check
+    def escape_checkmate_by_kill?(color, checking_piece)
+      friendly_pieces = chess_pieces.select { |piece| piece.color == color }
+      friendly_pieces.any? do |piece|
+        return false if piece.class == King
+        valid_moves = all_valid_moves(piece.location, piece.moves)
+        valid_moves.include? checking_piece.location
+      end
+    end
+
+    # Returns an array of any pieces that are checking the given color's king
+    def pieces_checking_king(color, king_location)
+      enemy_pieces(color).select do |piece|
+        valid_move?(piece.location[0], piece.location[1], 
+                    king_location[0], king_location[1])
+      end
+    end
+
+    # Given a color, returns all the enemy pieces (not the given color)
+    def enemy_pieces(color)
+      chess_pieces.select { |piece| piece.color != color }
+    end
 
     # Given a location of a piece and it set of possible moves, returns
     # an array of all valid moves for that piece given the board state

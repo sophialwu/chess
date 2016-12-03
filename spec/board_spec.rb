@@ -397,6 +397,41 @@ module Chess
         end
       end
 
+      context "given a black king at [6,4] in check by a "\
+              "white bishop at [4,2], and only one move to escape check" do
+        it "returns false" do
+          board.instance_variable_set(:@state, board.state.map do |row|
+            row.map { |square| nil }
+          end)
+          board.state[6][4] = King.new("black", [6,4])
+          board.state[6][5] = Bishop.new("white", [6,5])
+          board.state[7][5] = Bishop.new("black", [7,5])
+          board.state[4][2] = Bishop.new("white", [4,2])
+          board.state[4][3] = Knight.new("white", [4,3])
+          board.state[7][3] = Queen.new("black", [7,3])
+          expect(board.checkmate?("black")).to eql(false)
+        end
+      end
+
+      context "given a black king at [6,4] in check by only a white "\
+              "knight at [4,3], and the ability to escape check by "\
+              "the black pawn killing the knight" do
+        it "returns true" do
+          board.instance_variable_set(:@state, board.state.map do |row|
+            row.map { |square| nil }
+          end)
+          board.state[6][4] = Chess::King.new("black", [6,4])
+          board.state[6][5] = Chess::Bishop.new("white", [6,5])
+          board.state[7][5] = Chess::Bishop.new("black", [7,5])
+          board.state[5][3] = Chess::Bishop.new("black", [5,3])
+          board.state[4][4] = Chess::Knight.new("white", [4,4])
+          board.state[4][3] = Chess::Knight.new("white", [4,3])
+          board.state[7][3] = Chess::Queen.new("black", [7,3])
+          board.state[5][2] = Chess::Pawn.new("black", [5,2])
+          expect(board.checkmate?("black")).to eql(false)
+        end
+      end
+      
     end
 
   end
