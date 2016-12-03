@@ -158,6 +158,36 @@ module Chess
         end
       end
 
+      context "given a white pawn moving from [6,3] to [7,3]" do
+        it "sets the white pawn's @can_promote to true" do
+          board.state[6][3] = Pawn.new("white", [6,3])
+          board.state[7][3] = nil
+          expect(board.state[6][3].can_promote).to eql(false)
+          board.move_piece(6,3,7,3)
+          expect(board.state[7][3].can_promote).to eql(true)
+        end
+      end
+
+      context "given a black pawn moving from [1,1] to [0,1]" do
+        it "sets the black pawn's @can_promote to true" do
+          board.state[1][1] = Pawn.new("black", [1,1])
+          board.state[0][1] = nil
+          expect(board.state[1][1].can_promote).to eql(false)
+          board.move_piece(1,1,0,1)
+          expect(board.state[0][1].can_promote).to eql(true)
+        end
+      end
+
+      context "given a black pawn at [1,5] capturing a white bishop at [0,4]" do
+        it "sets the black pawn's @can_promote to true" do
+          board.state[1][5] = Pawn.new("black", [1,1])
+          board.state[0][4] = Bishop.new("white", [0,4])
+          expect(board.state[1][5].can_promote).to eql(false)
+          board.move_piece(1,5,0,4)
+          expect(board.state[0][4].can_promote).to eql(true)
+        end
+      end
+
     end
 
     describe "#valid_move?" do

@@ -39,17 +39,10 @@ module Chess
       
       moved_piece = @state[to_row][to_column]
       if moved_piece.class == Pawn
-        if en_passant_allowed?(moved_piece, from_row)
-          moved_piece.allow_en_passant = true
-        end
-        if valid_en_passant_move?(moved_piece.color, from_row, to_column)
-          @state[from_row][to_column] = nil
-        end
-        moved_piece.moved = true
+        special_pawn_rules(moved_piece, from_row, to_column)
       end
-
-      disallow_all_en_passant(piece.color) # Once a move has been made, disallow 
-                                           # taking en_passant on enemy pawns
+                                           # Once a move has been made, disallow
+      disallow_all_en_passant(piece.color) # taking en_passant on enemy pawns     
     end
 
     # Returns true if the move is valid (given a from and to location)
@@ -136,6 +129,30 @@ module Chess
 
 
     private
+
+    # Helper function to move_piece that accounts for special pawn
+    # rules such as en passant, promotion, and moved/not moved
+    def special_pawn_rules(moved_piece, from_row, to_column)
+      if en_passant_allowed?(moved_piece, from_row)
+          moved_piece.allow_en_passant = true
+      end
+
+      if valid_en_passant_move?(moved_piece.color, from_row, to_column)
+        @state[from_row][to_column] = nil
+      end
+
+      if promotion?(moved_piece)
+        moved_piece.can_promote = true
+      end
+
+      moved_piece.moved = true
+    end
+
+    # Returns true if the pawn can be promoted
+    def promotion?(pawn)
+      pawn.location[0] == 0 || pawn.location[0] == 7
+      # Don't need to separate by color as pawns can only move in 1 direction
+    end
 
     # Returns true if the color pawn is making a valid en passant move
     def valid_en_passant_move?(color, from_row, to_column)
