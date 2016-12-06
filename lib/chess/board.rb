@@ -107,6 +107,14 @@ module Chess
       end
     end
 
+    # Returns true if for a given color and location, the location is
+    # on the board and contains a piece of the color
+    def valid_player_piece?(color, location)
+      return false unless location.all? { |c| c.between?(0,7) }
+      potential_piece = @state[location[0]][location[1]]
+      potential_piece != nil && potential_piece.color == color
+    end
+
     # Returns a stringifed version of the board
     def to_s
       board = "\n"
