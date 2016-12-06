@@ -4,6 +4,7 @@ module Chess
   class Game
     # TODO:
     # => Ability for game to end when there is a draw
+    # => Save/load game 
 
     def initialize(player1="Player 1", player2="Player 2")
       @player1 = Player.new(player1, "white")

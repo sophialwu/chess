@@ -10,6 +10,7 @@ The following game functionalities are still in progress:
 - Castling
 - Ability to move piece in between king and checking piece to avoid check
 - Stalemate/Draw
+- Saving/loading a game
 
 ## Installation
 
