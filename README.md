@@ -6,6 +6,11 @@ Chess is a two-player strategy board game played on an 8x8 grid. Each player has
 
 If you would like more detail on the rules of chess, click [here](http://www.chessvariants.com/d.chess/chess.html).
 
+The following game functionalities are still in progress:
+- Castling
+- Ability to move piece in between king and checking piece to avoid check
+- Stalemate/Draw
+
 ## Installation
 
 Add this line to your application's Gemfile:

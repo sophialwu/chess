@@ -1,5 +1,8 @@
 module Chess
- 
+  # TODO: 
+  # => Castling functionality
+  # => Ability to move piece in between king and checking piece to avoid
+  #    check (only if checking piece is a bishop, rook, or queen)
   # Represents the chess board
   class Board
     attr_reader :state
