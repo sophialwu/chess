@@ -197,11 +197,13 @@ module Chess
     # Returns true if given a color and enemy piece that is checking the
     # king, a friendly piece can kill the enemy piece, removing the check
     def escape_checkmate_by_kill?(color, checking_piece)
-      friendly_pieces = chess_pieces.select { |piece| piece.color == color }
+      friendly_pieces = chess_pieces.select do |piece|
+        piece.color == color && piece.class != King
+      end
+
       friendly_pieces.any? do |piece|
-        return false if piece.class == King
         valid_moves = all_valid_moves(piece.location, piece.moves)
-        valid_moves.include? checking_piece.location
+        valid_moves.include?(checking_piece.location)
       end
     end
 
